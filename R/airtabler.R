@@ -535,24 +535,30 @@ air_table_funs <- function(base, table_name) {
   res_list
 }
 
-.bind_df <- function(x) {
-  # x = list of data frames
-  if(length(unique(lengths(x))) != 1) {
+.bind_df <- function(dfs) {
+  # dfs = list of data frames
 
-    # add missing columns
-    col_names <- unique(unlist(lapply(x, names)))
-    col_missing <- lapply(x, function(x) setdiff(col_names, names(x)))
+  # add missing columns
+  all_col_names <- unique(unlist(lapply(dfs, names)))
 
-    x <- lapply(seq_along(x), function(i) {
-      ret <- x[[i]]
-      for(col in col_missing[[i]]) {
-        ret[[col]] <- NA
+  dfs_m = list()
+  for (i in seq(length(dfs))) {
+    df = dfs[[i]]
+
+    for (col in all_col_names) {
+      if (class(df[[col]]) == 'data.frame') {
+        row.names(df[[col]]) <- df$id # this takes care of the embedded data.framse
+        next
       }
-      ret
-    })
+
+      if ( is.null(df[[col]]) ) {
+        df[[col]] <- NA
+        next
+      }
+    }
+
+    dfs_m[[i]] = df
   }
 
-  do.call(rbind, x)
-
+  do.call(rbind, dfs_m)
 }
-
