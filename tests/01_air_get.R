@@ -7,7 +7,7 @@ source('R/airtabler.R')
 offset = NULL
 i = 0
 returns = list()
-while ( T ) {
+repeat {
     i = i + 1
     
     x = air_get(base = TEST_BASE, table_name = TEST_TABLE, offset = offset)
