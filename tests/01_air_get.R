@@ -1,5 +1,6 @@
 # Testing air_get() for exposing offset
-# Upon succsessful completion 
+# Check returns variable for correct content
+
 source('tests/00_setup.R')
 source('R/airtabler.R')
 
