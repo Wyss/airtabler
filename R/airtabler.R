@@ -102,6 +102,43 @@ air_get <- function(base, table_name, record_id = NULL,
   ret
 }
 
+
+#' Get all records from table
+#'
+#' You can retrieve all records from a table. The results will include only records
+#' visible in the order they are displayed.
+#'
+#' @param base Airtable base
+#' @param table_name Table name
+#' @param view (optional) The name or ID of the view
+#' @param sortField (optional) The field name to use for sorting
+#' @param sortDirection (optional) "asc" or "desc". The sort order in which the
+#'   records will be returned. Defaults to asc.
+#' @return A data frame with records
+#' @export
+air_get_all <- function(base, 
+                          table_name,
+                          view = NULL,
+                          sortField = NULL,
+                          sortDirection = NULL) {
+  offset = NULL
+  batches = list()
+  i = 1
+  repeat {
+    ret = air_get(base, table_name, record_id = NULL, limit = NULL,
+                  offset, view, sortField, sortDirection,
+                  combined_result = TRUE)
+
+    offset = get_offset(ret)
+    batches[[i]] = ret
+
+    if ( is.null(offset) ) { break; }
+    i = i + 1
+  }
+
+  .bind_df(batches)
+}
+
 list_params <- function(x, par_name) {
   # converts a list of sublists to a list
   # Example:
