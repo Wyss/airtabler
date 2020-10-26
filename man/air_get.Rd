@@ -4,9 +4,17 @@
 \alias{air_get}
 \title{Get a list of records or retreive a single}
 \usage{
-air_get(base, table_name, record_id = NULL, limit = NULL, offset = NULL,
-  view = NULL, sortField = NULL, sortDirection = NULL,
-  combined_result = TRUE)
+air_get(
+  base,
+  table_name,
+  record_id = NULL,
+  limit = NULL,
+  offset = NULL,
+  view = NULL,
+  sortField = NULL,
+  sortDirection = NULL,
+  combined_result = TRUE
+)
 }
 \arguments{
 \item{base}{Airtable base}
