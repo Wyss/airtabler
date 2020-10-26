@@ -89,6 +89,7 @@ air_get <- function(base, table_name, record_id = NULL,
   )
   air_validate(res)      # throws exception (stop) if error
   ret <- air_parse(res)  # returns R object
+  offset <- attr(ret, "offset")
   if(combined_result && is.null(record_id)) {
     # combine ID, Fields and CreatedTime in the same data frame:
     ret <-
@@ -97,6 +98,7 @@ air_get <- function(base, table_name, record_id = NULL,
         stringsAsFactors =FALSE
       )
   }
+  attr(ret, "offset") <- offset  
   ret
 }
 
@@ -214,8 +216,8 @@ air_select <- function(
         id = ret$id, ret$fields, createdTime = ret$createdTime,
         stringsAsFactors =FALSE
       )
-    attr(ret, "offset") <- offset
   }
+  attr(ret, "offset") <- offset
   ret
 }
 
