@@ -584,13 +584,12 @@ air_table_funs <- function(base, table_name) {
 
     for (col in all_col_names) {
       if (class(df[[col]]) == 'data.frame') {
-        row.names(df[[col]]) <- df$id # this takes care of the embedded data.framse
+        row.names(df[[col]]) <- df$id # this takes care of the embedded data.frames
         next
       }
 
       if ( is.null(df[[col]]) ) {
         df[[col]] <- NA
-        next
       }
     }
 
