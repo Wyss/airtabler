@@ -4,9 +4,19 @@
 \alias{air_select}
 \title{Select}
 \usage{
-air_select(base, table_name, record_id = NULL, fields = NULL,
-  filterByFormula = NULL, maxRecord = NULL, sort = NULL, view = NULL,
-  pageSize = NULL, offset = NULL, combined_result = TRUE)
+air_select(
+  base,
+  table_name,
+  record_id = NULL,
+  fields = NULL,
+  filterByFormula = NULL,
+  maxRecord = NULL,
+  sort = NULL,
+  view = NULL,
+  pageSize = NULL,
+  offset = NULL,
+  combined_result = TRUE
+)
 }
 \arguments{
 \item{base}{Airtable base}

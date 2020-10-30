@@ -62,13 +62,16 @@ air_api_key <- function() {
 #' @return A data frame with records or a list with record details if
 #'   \code{record_id} is specified.
 #' @export
-air_get <- function(base, table_name, record_id = NULL,
-                   limit = NULL,
-                   offset = NULL,
-                   view = NULL,
-                   sortField = NULL,
-                   sortDirection = NULL,
-                   combined_result = TRUE) {
+air_get <- function(
+  base,
+  table_name,
+  record_id = NULL,
+  limit = NULL,
+  offset = NULL,
+  view = NULL,
+  sortField = NULL,
+  sortDirection = NULL,
+  combined_result = TRUE) {
 
   search_path <- table_name
   if(!missing(record_id)) {
@@ -89,6 +92,7 @@ air_get <- function(base, table_name, record_id = NULL,
   )
   air_validate(res)      # throws exception (stop) if error
   ret <- air_parse(res)  # returns R object
+  offset <- attr(ret, "offset")
   if(combined_result && is.null(record_id)) {
     # combine ID, Fields and CreatedTime in the same data frame:
     ret <-
@@ -97,7 +101,47 @@ air_get <- function(base, table_name, record_id = NULL,
         stringsAsFactors =FALSE
       )
   }
+  attr(ret, "offset") <- offset  
   ret
+}
+
+
+#' Get all records from table
+#'
+#' You can retrieve all records from a table. The results will include only records
+#' visible in the order they are displayed.
+#'
+#' @param base Airtable base
+#' @param table_name Table name
+#' @param view (optional) The name or ID of the view
+#' @param sortField (optional) The field name to use for sorting
+#' @param sortDirection (optional) "asc" or "desc". The sort order in which the
+#'   records will be returned. Defaults to asc.
+#' @return A data frame with records
+#' @export
+air_get_all <- function(
+  base, 
+  table_name,
+  view = NULL,
+  sortField = NULL,
+  sortDirection = NULL) {
+
+  offset = NULL
+  batches = list()
+  i = 1
+  repeat {
+    ret = air_get(base, table_name, record_id = NULL, limit = NULL,
+                  offset, view, sortField, sortDirection,
+                  combined_result = TRUE)
+
+    offset = get_offset(ret)
+    batches[[i]] = ret
+
+    if ( is.null(offset) ) { break; }
+    i = i + 1
+  }
+
+  .bind_df(batches)
 }
 
 list_params <- function(x, par_name) {
@@ -214,8 +258,8 @@ air_select <- function(
         id = ret$id, ret$fields, createdTime = ret$createdTime,
         stringsAsFactors =FALSE
       )
-    attr(ret, "offset") <- offset
   }
+  attr(ret, "offset") <- offset
   ret
 }
 
@@ -256,13 +300,16 @@ air_validate <- function(res) {
 
 air_parse <- function(res) {
   res_obj <- jsonlite::fromJSON(httr::content(res, as = "text"))
-  if(!is.null(res_obj$records)) {
-    res <- res_obj$records
-    if(!is.null(res_obj$offset)) {
-      attr(res, "offset") <- res_obj$offset
-    }
-  } else {
-    res <- res_obj
+
+  # Single entry returned, terminate early: expose all key-value pairs
+  if(is.null(res_obj$records)) { return(res_obj) }
+
+  # Multiple entries returned: expose values under 'records' key
+  res <- res_obj$records
+
+  # Add offset, if available
+  if(!is.null(res_obj$offset)) {
+    attr(res, "offset") <- res_obj$offset
   }
   res
 }
@@ -530,24 +577,29 @@ air_table_funs <- function(base, table_name) {
   res_list
 }
 
-.bind_df <- function(x) {
-  # x = list of data frames
-  if(length(unique(lengths(x))) != 1) {
+.bind_df <- function(dfs) {
+  # dfs = list of data frames
 
-    # add missing columns
-    col_names <- unique(unlist(lapply(x, names)))
-    col_missing <- lapply(x, function(x) setdiff(col_names, names(x)))
+  # add missing columns
+  all_col_names <- unique(unlist(lapply(dfs, names)))
 
-    x <- lapply(seq_along(x), function(i) {
-      ret <- x[[i]]
-      for(col in col_missing[[i]]) {
-        ret[[col]] <- NA
+  dfs_m = list()
+  for (i in seq(length(dfs))) {
+    df = dfs[[i]]
+
+    for (col in all_col_names) {
+      if (class(df[[col]]) == 'data.frame') {
+        row.names(df[[col]]) <- df$id # this takes care of the embedded data.frames
+        next
       }
-      ret
-    })
+
+      if ( is.null(df[[col]]) ) {
+        df[[col]] <- NA
+      }
+    }
+
+    dfs_m[[i]] = df
   }
 
-  do.call(rbind, x)
-
+  do.call(rbind, dfs_m)
 }
-
