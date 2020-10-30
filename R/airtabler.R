@@ -62,13 +62,16 @@ air_api_key <- function() {
 #' @return A data frame with records or a list with record details if
 #'   \code{record_id} is specified.
 #' @export
-air_get <- function(base, table_name, record_id = NULL,
-                   limit = NULL,
-                   offset = NULL,
-                   view = NULL,
-                   sortField = NULL,
-                   sortDirection = NULL,
-                   combined_result = TRUE) {
+air_get <- function(
+  base,
+  table_name,
+  record_id = NULL,
+  limit = NULL,
+  offset = NULL,
+  view = NULL,
+  sortField = NULL,
+  sortDirection = NULL,
+  combined_result = TRUE) {
 
   search_path <- table_name
   if(!missing(record_id)) {
@@ -116,11 +119,13 @@ air_get <- function(base, table_name, record_id = NULL,
 #'   records will be returned. Defaults to asc.
 #' @return A data frame with records
 #' @export
-air_get_all <- function(base, 
-                          table_name,
-                          view = NULL,
-                          sortField = NULL,
-                          sortDirection = NULL) {
+air_get_all <- function(
+  base, 
+  table_name,
+  view = NULL,
+  sortField = NULL,
+  sortDirection = NULL) {
+
   offset = NULL
   batches = list()
   i = 1
