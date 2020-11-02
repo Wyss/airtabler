@@ -4,4 +4,4 @@
 # Check returns_bound variable for correct content
 
 source('tests/01_air_get.R')
-returns_bound = .bind_df(returns)
+returns_bound = bind_nested_df(returns)
