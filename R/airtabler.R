@@ -141,7 +141,7 @@ air_get_all <- function(
     i = i + 1
   }
 
-  .bind_df(batches)
+  bind_nested_df(batches)
 }
 
 list_params <- function(x, par_name) {
@@ -548,7 +548,7 @@ air_table_funs <- function(base, table_name) {
     }) {}
     if(length(ret_all) == 0) { return(list())}
 
-    .bind_df(ret_all)
+    bind_nested_df(ret_all)
   }
 
   res_list[["get"]] <-
@@ -577,7 +577,7 @@ air_table_funs <- function(base, table_name) {
   res_list
 }
 
-.bind_df <- function(dfs) {
+bind_nested_df <- function(dfs) {
   # dfs = list of data frames
 
   # add missing columns
