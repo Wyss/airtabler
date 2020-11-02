@@ -232,6 +232,13 @@ hotels <- air_select(travel_base, "Hotels")
 # get one record
 radisson <- air_select(travel_base, "Hotels", record_id = "recgKO7K15YyWEsdb")
 
+# get multiple records,
+# use get_offset() to get the offset for the next page
+radisson <- air_get(travel_base, "Hotels", offset = NULL)
+
+# get all records
+radisson <- air_get_all(travel_base, "Hotels")
+
 # create
 inserted <- air_insert(travel_base, "Hotels", record_data)
 
