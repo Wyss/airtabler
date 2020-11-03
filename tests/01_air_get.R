@@ -2,7 +2,7 @@
 # Check returns variable for correct content
 
 source('tests/00_setup.R')
-source('R/airtabler.R')
+devtools::load_all()
 
 offset = NULL
 i = 0

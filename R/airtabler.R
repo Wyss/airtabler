@@ -141,7 +141,7 @@ air_get_all <- function(
     i = i + 1
   }
 
-  .bind_df(batches)
+  bind_nested_df(batches)
 }
 
 list_params <- function(x, par_name) {
@@ -548,7 +548,7 @@ air_table_funs <- function(base, table_name) {
     }) {}
     if(length(ret_all) == 0) { return(list())}
 
-    .bind_df(ret_all)
+    bind_nested_df(ret_all)
   }
 
   res_list[["get"]] <-
@@ -577,7 +577,22 @@ air_table_funs <- function(base, table_name) {
   res_list
 }
 
-.bind_df <- function(dfs) {
+#' Bind nested data.frames
+#'
+#' Create a \code{data.frame} from a \code{list} of \code{data.frames}, similar to
+#' \code{\link[base]{rbind}}, but if there are embedded \code{data.frame}s they will be unpacked.
+#' This method will work \strong{only} with an embedded \code{data.frame} that has a \strong{single row}!
+#' 
+#' This can be useful when the Last Updated columns are fetched from Airtable 
+#' which may make joining \code{data.frames} difficult. Column names of embedded \code{data.frame}s are
+#' that of the parent \code{data.frame} concatenated by the child \code{data.frame}.
+#' E.g. \code{Last Updated.email}
+#'
+#' @param dfs \code{list} of \code{data.frame}s
+#'
+#' @return A \code{data.frame} with rows joined and embedded \code{data.frame}s expanded
+#' @export
+bind_nested_df <- function(dfs) {
   # dfs = list of data frames
 
   # add missing columns
